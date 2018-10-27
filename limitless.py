@@ -24,8 +24,16 @@ def parse_limitless(limitless_id):
             continue
 
         cells = row.find_all('td')
-        player_name = cells[1].a.string
+        player_name = cells[1].a.string.title()
         deck_name = cells[3].span.attrs['data-original-title']
         limitless_data[player_name] = deck_name
 
-    return limitless_data
+    infobox = dom.find('div', {'class': 'infobox'})
+    name = infobox.find('p', {'class': 'infobox-heading'}).text.strip()
+    date = infobox.find('p', {'class': 'infobox-line'}).text.split('|')[0].strip()
+    tournament = {
+        'name': name,
+        'date': date
+    }
+
+    return limitless_data, tournament

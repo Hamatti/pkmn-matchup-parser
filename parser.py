@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+import json
 
 from limitless import parse_limitless
 from match import Winner, Match
@@ -25,9 +26,10 @@ class Parser:
             self.fetch_page(page)
 
         self.print_players(sort=True)
+        self.write_json()
 
     def fetch_limitless(self):
-        self.limitless = parse_limitless(self.limitless_id)
+        self.limitless, self.tournament = parse_limitless(self.limitless_id)
 
     def fetch_page(self, page):
         print(f'Parsing page {page}')
@@ -80,7 +82,7 @@ class Parser:
                                 match_dom.find('div', {'class': 'player1'})
                             )
                   )
-        player1 = self.get_or_create_player(
+        player2 = self.get_or_create_player(
                             self.parse_name(
                                 match_dom.find('div', {'class': 'player2'})
                             )
@@ -108,7 +110,7 @@ class Parser:
         match = Match(player1, player2, int(round_nro), winner)
         return match
 
-    def parse_name(player_dom):
+    def parse_name(self, player_dom):
         try:
             parts = player_dom.text.split('\n')
             first = parts[1].strip().title()
@@ -116,3 +118,26 @@ class Parser:
             return f'{first} {last}'
         except IndexError as e:
             return None
+
+    def write_json(self):
+        filename = f'output/{self.rk9_id}-{self.limitless_id}.json'
+        tournament = {
+            'name': self.tournament['name'],
+            'date': self.tournament['date'],
+            'rk9_id': self.rk9_id,
+            'limitless_id': self.limitless_id
+        }
+        players = [player.serialize() for name, player in self.players.items()]
+        matches = [match.serialize() for match in self.matchups]
+
+        for match in matches:
+            print(match)
+
+        output = {
+            'tournament': tournament,
+            'players': players,
+            'matches': matches
+        }
+
+        file_handle = open(filename, 'w')
+        json.dump(output, file_handle)
