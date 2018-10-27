@@ -95,6 +95,7 @@ def parse_limitless(limitless_id):
     driver.implicitly_wait(10)
     driver.get(f'{LIMITLESS_BASEURL}{limitless_id}')
     dom = BeautifulSoup(driver.page_source, 'lxml')
+    driver.close()
 
     ranking = dom.find('table', {'class': 'rankingtable'})
     limitless_data = {}
