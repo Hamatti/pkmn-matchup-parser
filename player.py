@@ -17,3 +17,13 @@ class Player:
 
     def __gt__(self, other):
         return self.points() > other.points()
+
+    def serialize(self):
+        return {
+            'name': self.name,
+            'deck': self.deck,
+            'wins': self.wins,
+            'losses': self.losses,
+            'ties': self.ties
+        }
+
