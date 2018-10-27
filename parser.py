@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import json
+import os
 
 from limitless import parse_limitless
 from match import Winner, Match
@@ -120,6 +121,8 @@ class Parser:
             return None
 
     def write_json(self):
+        if not os.path.exists('output'):
+            os.makedirs('output')
         filename = f'output/{self.rk9_id}-{self.limitless_id}.json'
         tournament = {
             'name': self.tournament['name'],
